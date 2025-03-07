@@ -1,0 +1,17 @@
+/* rexx command to sort a stem variable
+   Simple bubble sort of "stem' by stem.1
+   Ken Singer, Shell Oil, Houston
+ ********************************************************/
+  if stem.0 = 1 then return /* simple sort !*/
+  ctr =  stem.0
+  do y = 1 to  ctr - 1
+     do x = y+1 to ctr
+        if stem.x = null then leave
+        if stem.x < stem.y then do
+            /* swap these 2 entries */
+            t1 = stem.y ;
+            stem.y = stem.x
+            stem.x = t1
+        end
+     end x
+  end y

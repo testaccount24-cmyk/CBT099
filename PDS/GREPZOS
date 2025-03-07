@@ -1,0 +1,114 @@
+  /* --------------------------------------------- *
+   | Sample REXX code to use grep to search a z/OS |
+   | sequential dataset for a string:              |
+   * --------------------------------------------- */
+  arg file string
+  x = searchstring(file,string)
+  if x = 0 then do
+     say 'No results found for:' string
+     exit 4
+     end
+  do i = 1 to results.0
+     say results.i
+     end
+  exit
+
+  /* -------------------------------------------------------- *
+  | Search String subroutine.       (copy into main REXX)    |
+  |                                                          |
+  | x = SearchString(dsname,string)                          |
+  |                                                          |
+  | NOTEs:                                                   |
+  |    1. dsname will use the users TSO Profile Prefix       |
+  |       if not qualified in quotes                         |
+  |    2. Results will be returned in the results. stem      |
+  |                                                          |
+  | String may be:   string                                  |
+  |                  string1|string2    (or)                 |
+  |                  sgring1.*string2   (and)                |
+  |                                                          |
+  | Uses OMVS cat to extract the data and pipes to OMVS      |
+  | grep to do the case insensitive search.                  |
+  |                                                          |
+  | The $ is escaped if found in the dataset name.           |
+  * -------------------------------------------------------- */
+SearchString: Procedure Expose Results.
+  file   = arg(1)
+  string = arg(2)
+  say 'searching file:' file
+  say 'search string: ' string
+
+/* --------------------- *
+ | Validate dataset name |
+ * --------------------- */
+  x = listdsi(file)
+  if x > 0 then do
+     say "'"file"'" sysdsn(file)
+     exit 16
+     end
+
+/* --------------------- *
+ | Check for member name |
+ * --------------------- */
+  if pos('(',file) > 0 then do
+    parse value file with '('mem')'
+    sysdsname = sysdsname'('mem')'
+  end
+
+/* -------------------------------------- *
+ | Escape any $ found in the dataset name |
+ * -------------------------------------- */
+  if pos('$',sysdsname) > 0 then
+  do forever
+    if pos('\$',sysdsname) > 0 | pos('$',sysdsname) = 0 then leave
+    p = pos('$',sysdsname)
+    ld = left(sysdsname,p-1)
+    rd = substr(sysdsname,p+1)
+    sysdsname = ld'\$'rd
+  end
+
+/* -------------------------------- *
+ | Escape any $ found in the string |
+ * -------------------------------- */
+  if pos('$',string) > 0 then
+  do forever
+    if pos('\$',string) > 0 | pos('$',string) = 0 then leave
+    p = pos('$',string)
+    ld = left(string,p-1)
+    rd = substr(string,p+1)
+    string = ld'\$'rd
+  end
+
+/* --------------------------------------------- *
+ | Create OMVS supported format for dataset name |
+ * --------------------------------------------- */
+  dsn = '"//'||"'"sysdsname"'"||'"'
+
+/* ----------------- *
+ | Drop results stem |
+ * ----------------- */
+  drop results.
+
+/* ---------------------------------------------------- *
+ | Invoke BPXWUNIX                                      |
+ | 1st to cat (copy) the z/OS dataset into the pipe (|) |
+ | and 2nd to grep (search) the results for the string  |
+ | with the results going into the results. stem        |
+ | and errors into the e. stem.                         |
+ * ---------------------------------------------------- */
+  x = bpxwunix('cat' dsn "| grep -E -i '"string"'",,results.,e.)
+
+/* -------------------------------------------- *
+ | If no errors return the results record count |
+ * -------------------------------------------- */
+  if e.0 = 0 then return results.0
+
+/* -------------------------------- *
+ | Otherwise say the error messages |
+ * -------------------------------- */
+  if e.0 > 0 then do
+    say ' '
+    say 'errors:'
+    do i = 1 to e.0;say e.i;end
+  end
+  return 0
