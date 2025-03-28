@@ -45,5 +45,4 @@ This is still a work in progress. GitHub repos will be deleted and created durin
 //*     TSO8        Test if 8 character TSO Userids allowed         *   FILE 099
 //*     WHOSON      Display all active TSO, ssh, and zOSMF users    *   FILE 099
 //*                                                                 *   FILE 099
-
 ```
