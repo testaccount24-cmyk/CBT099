@@ -1,0 +1,22 @@
+/* ---------------------- REXX ----------------------------- *
+ | ISPF Edit Macro to display the requested record in hex in |
+ | an infoline.  (Note: no validation is performed)          |
+ |                                                           |
+ | Syntax:  EHEX line                                        |
+ |                                                           |
+ | Where EHEX is the macro name (change as you wish)         |
+ |       line is a record number                             |
+ |                                                           |
+ | Sample:  EHEX 4                                           |
+ * --------------------------------------------------------- */
+  Address ISREdit
+  'Macro (line)'
+  '(data) = line' line
+  hex = c2x(data)
+  parse value '' with hextop hexbot
+  do i = 1 to length(hex) by 2
+    hextop = hextop''substr(hex,i,1)
+    hexbot = hexbot''substr(hex,i+1,1)
+  end
+  'line_after' line '= infoline (hexbot)'
+  'line_after' line '= infoline (hextop)'

@@ -1,0 +1,15 @@
+  /* --------------------- REXX ----------------------- *
+  | Get the JOB Name and JOB Id (number) of the active |
+  | job using the TSO Status command.                  |
+  * -------------------------------------------------- */
+  jobn = MVSVAR('SYMDEF','JOBNAME')
+  call outtrap 'j.'
+  'st' jobn
+  call outtrap 'off'
+
+  do i = 1 to j.0
+    if wordpos('EXECUTING',j.i) > 0 then leave
+  end
+  parse value j.i with . '('jobnum')' .
+  say 'Jobname:' jobn 'Jobnum:' jobnum
+  say jobn'('jobnum')'

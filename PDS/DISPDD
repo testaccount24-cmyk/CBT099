@@ -1,0 +1,34 @@
+/* ------------------------- REXX ---------------------------- *
+  | Display all of the datasets allocated to a specific DDName. |
+  |                                                             |
+  | Syntax: %dispdd ddname                                      |
+  * ----------------------------------------------------------- */
+  arg cdd
+
+  if strip(cdd) = '' then exit 16
+
+  call outtrap 'trap.'
+  "lista sta"
+  call outtrap 'off'
+
+  dsns = ''
+
+  do i = 2 to trap.0
+    if word(trap.i,1) = 'TERMFILE' then iterate
+    if left(trap.i,1) /= ' ' then do   /* have dataset name */
+      j = i + 1
+      if words(trap.j) = 2 then
+      parse value trap.j with dd state
+      if dd /= cdd then iterate
+      dsns = dsns word(trap.i,1)
+      i = i + 1
+    end
+  end
+
+  /* -------------- *
+  | Now report out |
+  * -------------- */
+  say words(dsns) 'Datasets found for DD' cdd
+  do i = 1 to words(dsns)
+    say right(i,2) word(dsns,i)
+  end
