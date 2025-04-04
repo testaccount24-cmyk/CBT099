@@ -1,0 +1,13 @@
+/* rexx */
+  say 'Length of supported TSO Userids:' userid_len_check()
+  exit
+Userid_Len_Check:
+  /* --------------------------------------- *
+  | Check the 8 character TSO Userid state. |
+  * --------------------------------------- */
+  cvt  = c2d(storage(10,4))
+  tsvt = c2d(storage(d2x(cvt+156),4))  /* cvt + 9C */
+  tsvtumxl = c2d(storage(d2x(tsvt + 6), 1))   /* tsvt + 6 */
+  if tsvtumxl = 0 then return 7
+  else
+  return tsvtumxl

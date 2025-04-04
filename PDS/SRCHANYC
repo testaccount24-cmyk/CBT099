@@ -1,0 +1,31 @@
+  /* ---------------------------------------------------- *
+  | Change the zus4anyc (SRCHFOR default) to selected (/) |
+  | if it is null with option Set.                        |
+  | Or option Reset restore it.                           |
+  |                                                       |
+  | Use this before and after thus:                       |
+  |                                                       |
+  | Address ISPExec                                       |
+  | call check_anyc 'SET'                                 |
+  | "LMDINIT LISTID(LISTID) LEVEL("hlq"."file_pfx"*)"     |
+  | "LMDDISP LISTID("ListId") Confirm(Yes)"               |
+  | "LMDFREE LISTID("ListId")"                            |
+  | call check_anyc 'RESET'                               |
+  |                                                       |
+  * ----------------------------------------------------- */
+Check_AnyC:
+  arg anyc_opt
+  'VGet (ZUS4ANYC) Profile'
+  if anyc_opt = 'SET' then do
+    save_anyc = zus4anyc
+    if zus4anyc = '/' then return
+    if zus4anyc = ''
+    then zus4anyc = '/'
+    'vput (zus4anyc) profile'
+  end
+  if anyc_opt = 'RESET' then do
+    if save_zus4anyc = '/' then return
+    zus4anyc = save_anyc
+    'Vput (ZUS4ANYC) Profile'
+  end
+  return

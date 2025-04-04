@@ -1,0 +1,27 @@
+ /* ------------------------- REXX ------------------------------ *
+  | LABDEL: Sample REXX code to set a label and to remove a label |
+  | based upon the provided parm.                                 |
+  |                                                               |
+  | Syntax: labdel option                                         |
+  |                                                               |
+  |         option value:  null - add the label                   |
+  |                        anything else - remove the label       |
+  |                                                               |
+  * ------------------------------------------------------------- *
+  | Author: Lionel B. Dyck                                        |
+  * ------------------------------------------------------------- */
+  address isredit
+  'macro (opt)'
+
+  if opt = '' then do
+    /* Find string text */
+    "find 'string' first"
+    if rc > 0 then exit  /* no string found */
+
+    '(line) = cursor'   /* get line number */
+    'label' line '= .LAAA 0'  /* set label .LAAA on the line */
+  end
+  else do
+    /* now remove the label */
+    'reset label .LAAA .LAAA'
+  end

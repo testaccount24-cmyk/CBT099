@@ -1,0 +1,7 @@
+/* rexx */
+/* call USS sleep routine */
+parse arg sleep_sec .
+say time()
+address 'SYSCALL' 'SLEEP ('sleep_sec')'
+say time()
+return 0

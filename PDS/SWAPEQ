@@ -1,0 +1,23 @@
+  /* --------------- REXX ------------------ *
+   | SwapEQ - Swap the sides of an = setting |
+   |    a = b                                |
+   | becomes                                 |
+   |    b = a                                |
+   * --------------------------------------- */
+  Address ISREdit
+  "Macro (range) NOPROCESS"
+  "PROCESS RANGE S"
+  "(start)  = linenum .zfrange"
+  "(stop)   = linenum .zlrange"
+  do i = start to stop
+    '(data) = line' i
+    data = strip(data,'T')
+    parse value data with left'='right rest
+    leftchar = left(strip(left),1)
+    p = pos(leftchar,data)
+    if p > 1
+       then pad = copies(' ',p-1)
+       else pad = ''
+     data = pad || right '=' strip(left) rest
+    'line' i '= (data)'
+  end

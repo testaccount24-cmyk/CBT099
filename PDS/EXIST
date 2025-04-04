@@ -1,0 +1,31 @@
+  /* --------------------- REXX ---------------------- *
+   | This is a sample routine using REXX to deternmine |
+   | if a file exists within OMVS.                     |
+   * ------------------------------------------------- */
+   file = '~/.profile'
+  rc = exist(file)
+  if rc > 0 then say 'File exists'
+            else say 'File does not exist'
+  file = 'bad.file'
+  rc = exist(file)
+  if rc > 0 then say file 'File exists'
+            else say file 'File does not exist'
+  exit 0
+
+Exist: Procedure
+  parse arg file
+  x = syscalls('ON')   /* setup syscall environment */
+  if left(file,1) = '~'  /* test for ~ - home alias */
+  then do
+    address syscall ,    /* get the home directory in case */
+      'getpwnam' sysvar('sysuid') 'pw.'
+    home = pw.pw_dir     /* save it in home variable */
+    file = home''substr(file,2)  /* replace with home */
+  end
+  else file = file                  /* or not            */
+  address syscall ,
+    'stat (file) st.'      /* test if file exists */
+  x = syscalls('OFF')         /* Turn off syscalls environment */
+  return st.0                 /* return stat records:
+                                 where stem count of 0 means it
+                                 does not exist */
